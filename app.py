@@ -1,39 +1,51 @@
-from flask import Flask, render_template, request, send_file, jsonify
-from gtts import gTTS
-import io
+import os
+import requests
+from flask import Flask, request, send_file, jsonify
+from io import BytesIO
 
 app = Flask(__name__)
-MAX_CHARS = 5000
+
+# Token vem do Render (Environment Variable)
+HF_TOKEN = os.getenv("HF_TOKEN")
+
+# Modelo realista (Stable Diffusion)
+MODEL_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
+
+HEADERS = {
+    "Authorization": f"Bearer {HF_TOKEN}"
+}
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    return "API IA de Imagem rodando OK"
 
-@app.route("/tts", methods=["POST"])
-def tts():
-    try:
-        data = request.get_json()
-        texto = data.get("texto", "").strip()
-        idioma = data.get("idioma", "pt")
-        voz = data.get("voz", "female")  # "male" ou "female"
+@app.route("/generate-image", methods=["POST"])
+def generate_image():
+    data = request.json
+    prompt = data.get("prompt", "").strip()
 
-        if len(texto) == 0:
-            return jsonify({"erro": "Texto vazio"}), 400
-        if len(texto) > MAX_CHARS:
-            texto = texto[:MAX_CHARS]
+    if not prompt:
+        return jsonify({"error": "Prompt vazio"}), 400
 
-        # Simulação de gênero usando tld
-        tld = "com.br" if voz == "female" else "com"
-        tts = gTTS(text=texto, lang=idioma, tld=tld)
+    payload = {
+        "inputs": prompt,
+        "options": {"wait_for_model": True}
+    }
 
-        mp3_fp = io.BytesIO()
-        tts.write_to_fp(mp3_fp)
-        mp3_fp.seek(0)
+    response = requests.post(MODEL_URL, headers=HEADERS, json=payload)
 
-        return send_file(mp3_fp, mimetype="audio/mpeg", as_attachment=False, download_name="voz.mp3")
+    if response.status_code != 200:
+        return jsonify({"error": "Erro ao gerar imagem"}), 500
 
-    except Exception as e:
-        return jsonify({"erro": str(e)}), 500
+    image_bytes = BytesIO(response.content)
+    image_bytes.seek(0)
+
+    return send_file(
+        image_bytes,
+        mimetype="image/png",
+        as_attachment=False,
+        download_name="imagem.png"
+    )
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0", port=10000)
