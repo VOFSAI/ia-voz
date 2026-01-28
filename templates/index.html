@@ -3,200 +3,203 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IA de Voz</title>
+<title>Gerador de Imagens Realistas</title>
+
 <style>
 body {
-    font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    min-height: 100vh;
-    padding: 30px 20px;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  display: flex;
+  justify-content: center;
 }
+
+.container {
+  width: 100%;
+  max-width: 480px;
+  padding: 20px;
+}
+
 h1 {
-    margin-bottom: 20px;
-    text-align: center;
-    font-size: 28px;
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+  text-align: center;
+  margin-bottom: 15px;
 }
+
 textarea {
-    width: 95%;
-    max-width: 450px;
-    height: 300px;
-    padding: 15px;
-    font-size: 16px;
-    border-radius: 12px;
-    border: none;
-    margin-bottom: 10px;
-    resize: none;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  width: 100%;
+  height: 140px;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  resize: none;
 }
-select {
-    margin: 10px 5px;
-    padding: 8px;
-    border-radius: 8px;
-    border: none;
-    font-size: 16px;
+
+.examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
 }
-button {
-    background-color: #4caf50;
-    color: white;
-    padding: 15px 25px;
-    font-size: 18px;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 10px 0;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
+
+.examples button {
+  border: none;
+  background: #e0e0e0;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
 }
-button.loading {
-    background-color: #ffa500;
-}
-button.loading::after {
-    content: "";
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    border: 4px solid rgba(255,255,255,0.5);
-    border-top: 4px solid #fff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-@keyframes spin {
-    0% { transform: rotate(0deg);}
-    100% { transform: rotate(360deg);}
-}
-#downloadBtn {
-    background-color: #2196f3;
-    padding: 12px 20px;
-    text-decoration: none;
-    color: #fff;
-    border-radius: 12px;
-    display: none;
-    font-size: 16px;
-    margin-top: 10px;
-    transition: 0.3s;
-}
-#downloadBtn:hover {
-    background-color: #1976d2;
-}
-#status {
-    margin-top: 15px;
-    font-style: italic;
-}
+
 #charInfo {
-    font-size: 14px;
-    color: #ffeb3b;
-    margin-bottom: 10px;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 10px;
+  text-align: right;
 }
-audio {
-    margin-top: 20px;
-    width: 90%;
-    max-width: 450px;
-    border-radius: 12px;
-    outline: none;
+
+#generateBtn {
+  width: 100%;
+  padding: 14px;
+  font-size: 18px;
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+#resetBtn {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  background: #ddd;
+  color: #000;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+#status {
+  text-align: center;
+  margin: 15px 0;
+}
+
+#result img {
+  width: 100%;
+  border-radius: 12px;
+  margin-top: 10px;
+}
+
+#downloadBtn {
+  display: none;
+  margin-top: 10px;
+  text-align: center;
+  background: #4caf50;
+  color: #fff;
+  padding: 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: bold;
 }
 </style>
 </head>
+
 <body>
-<h1>IA de Voz</h1>
+<div class="container">
+  <h1>IA de Imagens Realistas</h1>
 
-<textarea id="texto" placeholder="Digite seu texto aqui..." maxlength="5000"></textarea>
-<div id="charInfo">0/5000 caracteres</div>
+  <textarea id="prompt" maxlength="500"
+    placeholder="Ex: Mulher sorrindo em um café moderno, estilo Instagram, luz natural">
+  </textarea>
 
-<div>
-    <select id="voiceSelect">
-        <option value="male">Masculina</option>
-        <option value="female">Feminina</option>
-    </select>
+  <div id="charInfo">0 / 500 caracteres</div>
 
-    <select id="langSelect">
-        <option value="pt">Português</option>
-        <option value="en">Inglês</option>
-        <option value="es">Espanhol</option>
-    </select>
+  <div class="examples">
+    <button onclick="setExample(this)">Mulher sorrindo em um café moderno</button>
+    <button onclick="setExample(this)">Homem elegante em rua urbana</button>
+    <button onclick="setExample(this)">Casal feliz ao pôr do sol</button>
+    <button onclick="setExample(this)">Influencer tirando selfie lifestyle</button>
+  </div>
+
+  <button id="generateBtn">Gerar Imagem</button>
+  <button id="resetBtn">Limpar</button>
+
+  <div id="status"></div>
+  <div id="result"></div>
+  <a id="downloadBtn" download="imagem.png">Download</a>
 </div>
 
-<button id="gerarBtn">🎤 Gerar Áudio</button>
-<a id="downloadBtn">⬇️ Download</a>
-
-<div id="status"></div>
-<audio id="audio" controls style="display:none;"></audio>
-
 <script>
-const gerarBtn = document.getElementById('gerarBtn');
-const downloadBtn = document.getElementById('downloadBtn');
-const texto = document.getElementById('texto');
-const voiceSelect = document.getElementById('voiceSelect');
-const langSelect = document.getElementById('langSelect');
-const status = document.getElementById('status');
-const audio = document.getElementById('audio');
-const charInfo = document.getElementById('charInfo');
-const MAX_CHARS = 5000;
+const promptEl = document.getElementById("prompt");
+const charInfo = document.getElementById("charInfo");
+const generateBtn = document.getElementById("generateBtn");
+const resetBtn = document.getElementById("resetBtn");
+const statusEl = document.getElementById("status");
+const resultEl = document.getElementById("result");
+const downloadBtn = document.getElementById("downloadBtn");
 
-// Contador de caracteres em tempo real
-texto.addEventListener('input', () => {
-    let length = texto.value.length;
-    if(length > MAX_CHARS) {
-        texto.value = texto.value.substring(0, MAX_CHARS);
-        length = MAX_CHARS;
-    }
-    charInfo.textContent = `${length}/${MAX_CHARS} caracteres`;
+// Contador de caracteres
+promptEl.addEventListener("input", () => {
+  const length = promptEl.value.length;
+  charInfo.textContent = `${length} / 500 caracteres`;
+  if(length >= 500) promptEl.value = promptEl.value.substring(0,500);
 });
 
-const BACKEND_URL = 'https://SEU-APP-RENDER.onrender.com/tts';
+// Exemplos clicáveis
+function setExample(btn) {
+  promptEl.value = btn.innerText;
+  charInfo.textContent = `${promptEl.value.length} / 500 caracteres`;
+}
 
-gerarBtn.addEventListener('click', async () => {
-    const textValue = texto.value.trim();
-    if (!textValue) return alert('Digite algum texto!');
+// Botão Limpar
+resetBtn.onclick = () => {
+  promptEl.value = "";
+  charInfo.textContent = "0 / 500 caracteres";
+  statusEl.innerText = "";
+  resultEl.innerHTML = "";
+  downloadBtn.style.display = "none";
+};
 
-    status.textContent = 'Gerando áudio...';
-    audio.style.display = 'none';
-    downloadBtn.style.display = 'none';
-    gerarBtn.classList.add('loading');
+// Botão Gerar Imagem
+generateBtn.onclick = async () => {
+  const text = promptEl.value.trim();
+  if (!text) {
+    alert("Digite uma descrição ou use um exemplo!");
+    return;
+  }
 
-    try {
-        const response = await fetch(BACKEND_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                texto: textValue,
-                idioma: langSelect.value,
-                voz: voiceSelect.value
-            })
-        });
+  statusEl.innerText = "Gerando imagem...";
+  resultEl.innerHTML = "";
+  downloadBtn.style.display = "none";
 
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.erro || 'Erro ao gerar áudio');
-        }
+  try {
+    // Substitua pelo endpoint real do backend
+    const res = await fetch("/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: text })
+    });
 
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
+    if (!res.ok) throw new Error("Erro ao gerar imagem");
 
-        audio.src = url;
-        audio.style.display = 'block';
-        audio.play();
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
 
-        downloadBtn.href = url;
-        downloadBtn.download = 'voz.mp3';
-        downloadBtn.style.display = 'inline-block';
+    const img = document.createElement("img");
+    img.src = url;
+    resultEl.appendChild(img);
 
-        status.textContent = 'Áudio pronto!';
-    } catch (err) {
-        status.textContent = 'Erro: ' + err.message;
-    } finally {
-        gerarBtn.classList.remove('loading');
-    }
-});
+    downloadBtn.href = url;
+    downloadBtn.style.display = "block";
+
+    statusEl.innerText = "Imagem pronta!";
+  } catch (err) {
+    statusEl.innerText = "Erro ao gerar imagem.";
+  }
+};
 </script>
 </body>
-    </html>
+</html>
