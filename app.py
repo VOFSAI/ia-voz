@@ -17,7 +17,7 @@ HEADERS = {
 
 @app.route("/")
 def home():
-    return "API IA de Imagem rodando OK"
+    return render_template("index.html")
 
 @app.route("/generate-image", methods=["POST"])
 def generate_image():
