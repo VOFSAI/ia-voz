@@ -9,8 +9,7 @@ app = Flask(__name__)
 HF_TOKEN = os.getenv("HF_TOKEN")
 
 # Modelo Stable Diffusion (realista)
-MODEL_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
-
+MODEL_URL = "https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5"
 HEADERS = {
     "Authorization": f"Bearer {HF_TOKEN}"
 }
