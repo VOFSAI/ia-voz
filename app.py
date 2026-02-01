@@ -36,9 +36,10 @@ def generate_image():
     try:
         response = requests.post(MODEL_URL, headers=HEADERS, json=payload)
 
-        if response.status_code != 200:
-            return jsonify({"error": "Erro ao gerar imagem"}), 500
-
+        if response.headers.get("content-type") != "image/png":
+    return jsonify({
+        "error": "Modelo ainda carregando, tente novamente em 30 segundos"
+    }), 503
         image_bytes = BytesIO(response.content)
         image_bytes.seek(0)
 
